@@ -43,7 +43,7 @@ int main()
             strcpy(buffer, "reno");
         }
         int i = 0;
-        while(i<=4)//we are running 5 times on each CC alforithm
+        while(i<=4) //we are running 5 times on each CC alforithm
         {
             int sockfd;
             sockfd = socket(AF_INET, SOCK_STREAM , 0); //opening socket eith ipv4 and TCP protocol 
@@ -117,7 +117,6 @@ int main()
                         bzero(reply, sizeof(reply));
                       
                         read(sockfd, reply, sizeof(reply));
-                       
                         
 
                         if(strcmp(reply, "GET") != 0)
