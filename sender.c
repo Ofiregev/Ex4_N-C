@@ -14,7 +14,7 @@
 #define SA struct sockaddr
 
 #define FILE_NAME "1mb.txt"
-#define PORT 3456
+#define PORT 3448
 
 int fd; //file descirptor
 struct stat f_stat; //struct that provides detailed information about a file
@@ -71,17 +71,18 @@ int main()
                     perror("getsockopt error");
                     return -1;
                 }
-
+                printf("The currnt CC algorithm is: %s\n", buffer);
                 struct sockaddr_in servaddr;
                 bzero(&servaddr, sizeof(servaddr));
                 servaddr.sin_family = AF_INET;
                 servaddr.sin_port = htons(PORT);
+
                 int connection ; //This var presents the return value of the connect function
                 connection = connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
                 if (connection != 0)
                 {
 		            printf("connection with the server failed...\n");
-		        exit(0);
+		            exit(0);
 	            }
 	            else
                 {
@@ -103,6 +104,7 @@ int main()
                             fprintf(stderr, "can't open the file");
                             return -1;
                         }
+
                         int file_state;
                         file_state = fstat(fd, &f_stat);
                         if(file_state < 0)
@@ -125,9 +127,9 @@ int main()
                         }
                         else
                         {
-                            printf("GOT A PERMISSION FROM THE SERVER");
+                            printf("GOT A PERMISSION FROM THE SERVER\n");
                         }
-                        printf("got here5\n");
+                        
                         char sendB[200]; // Buffer to send the file to the server
                         int r; // The return value of the fread function
                         int sum = 0;
@@ -138,17 +140,17 @@ int main()
                                 rv_send = send(sockfd, sendB, r , 0);
                                 sum = rv_send + sum; //summing the number of bites that were sent 
                             }
-                             printf(" %d bytes were sent, file number %d \n", sum, FILE_NUM++);
-                            sleep(3);
-                            close(sockfd);//closing the socket
-                            i++;//starting the next turn
+                        printf("%d bytes were sent\nfile number %d \n", sum, FILE_NUM++);
+                        sleep(1);
+                        close(sockfd);//closing the socket
+                        i++;//starting the next turn
                             
-                        }
+                    }
                 } 
             }
             
         }
-         t++;
+        t++;
     }
     return 0;
 }

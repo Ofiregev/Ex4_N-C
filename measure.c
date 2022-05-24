@@ -5,15 +5,17 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/time.h>
+#include <stdlib.h>
 
-#define PORT 3456
+#define PORT 3448
 #define SA struct sockaddr
 #define MBSIZE 1048576
 
 
 int main()
 {
-	int sockfd, connfd, len;
+	int sockfd = -1;
+	unsigned int len;
 	struct sockaddr_in servaddr, cli;
 	char buffer[100];
 
@@ -23,8 +25,8 @@ int main()
 		printf("socket creation failed...\n");
 		exit(0);
 	}
-	else
-		printf("Socket successfully created..\n");
+	
+	printf("Socket successfully created..\n");
 	bzero(&servaddr, sizeof(servaddr));
 
 	// assign IP, PORT
@@ -37,15 +39,14 @@ int main()
 		printf("socket bind failed...\n");
 		exit(0);
 	}
-	else
-		printf("Socket successfully binded..\n");
+	
+	printf("Socket successfully binded..\n");
 
 	// Now server is ready to listen and verification
 	if ((listen(sockfd, 100)) != 0) {
 		printf("Listen failed...\n");
 		exit(0);
 	}
-	else
 		printf("Server listening..\n");
 		len = sizeof(cli);
 		int i = 0;
@@ -64,27 +65,28 @@ int main()
 					printf("server accept failed...\n");
 					exit(0);
 				}
-				else
 				printf("server accept the client...\n");
-				char res[20]; // buffer for the response of the server
+				char res[5]; // buffer for the response of the server
 				strcpy(res,"GET");
-				write(clientSocket, res, sizeof(res));
+				write(clientSocket, res, sizeof(res));//working until here
+
 				struct timeval stop, start;
             	gettimeofday(&start, NULL); //start of process
-				int curBytes; //var for the recieved bytes from the client
+				int curBytes = -1; //var for the recieved bytes from the client
 				while(curBytes != 0)
 				{
 					curBytes = recv(clientSocket, buffer, 100, 0);
 					sum_of_bytes = sum_of_bytes + curBytes;
 				}
-				if(curBytes == MBSIZE)
+				if(sum_of_bytes == MBSIZE)
 				{
 					printf("Received all 1mb , file number %d \n", file_number);
 					file_number++;
 				}
 				else
 				{
-					printf("Received %d bytes\n", curBytes);
+					printf("Received only %d bytes\n", sum_of_bytes);
+					file_number++;
 				}
 				gettimeofday(&stop, NULL); //end of process
 
@@ -95,23 +97,23 @@ int main()
 
 				buffer[curBytes] = '\0';
 				sum_of_bytes = 0;
-				sleep(3);
-				}
+				sleep(1);
+			}
 
 				//The average of the sampled times:
-				    double avg_time = t * 0.25;
-        			char CC_algo[100]; // buffer for the CC algorithm
-					if (i != 0){ 
-						strcpy(CC_algo, "reno");
-						}
-					else{ 
-						strcpy(CC_algo, "cubic");
-						}
-					
-					printf("\nThe average time to get 5 files in TPC CC %s is: %f\n\n", CC_algo, avg_time);
-					
-					i++;
+			double avg_time = t / 5;
+			char CC_algo[100]; // buffer for the CC algorithm
+			if (i != 0){ 
+				strcpy(CC_algo, "reno");
 				}
+			else{ 
+				strcpy(CC_algo, "cubic");
+				}
+			
+			printf("\nThe average time to get 5 files in %s CC algorithm is: %f\n\n", CC_algo, avg_time);
+			
+			i++;
+		}
 
 			// 10. Closing a connection.
 
